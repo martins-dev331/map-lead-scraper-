@@ -72,10 +72,10 @@ HTML_CONTENT = """
                 data.results.forEach(lead => {
                     listDiv.innerHTML += `
                         <div class="bg-gray-800 p-4 rounded-xl border border-gray-700 space-y-2">
-                            <h3 class="font-bold text-white text-lg">\${lead.business_name}</h3>
-                            <p class="text-sm text-gray-300">📞 \${lead.phone}</p>
-                            <p class="text-sm text-green-300">📧 \${lead.email}</p>
-                            <a href="\${lead.website}" target="_blank" class="text-xs text-green-400 underline block">\${lead.website}</a>
+                            <h3 class="font-bold text-white text-lg">${lead.business_name}</h3>
+                            <p class="text-sm text-gray-300">📞 ${lead.phone}</p>
+                            <p class="text-sm text-green-300">📧 ${lead.email}</p>
+                            <a href="${lead.website}" target="_blank" class="text-xs text-green-400 underline block">${lead.website}</a>
                         </div>
                     `;
                 });
@@ -100,14 +100,10 @@ def home():
 @app.post("/scrape")
 def trigger_scrape(data: SearchRequest):
     query = data.query
-    
-    # We will use an open structured directory search approach to gather matching business URLs, 
-    # then parse their contact pages for real emails.
     scraped_leads = []
     
     try:
-        # Example search structure via DuckDuckGo HTML Lite (avoids heavy blocks)
-        search_url = f"https://html.duckduckgo.com/html/?q={requests.utils.quote(query + ' contact email phone website')} "
+        search_url = f"https://html.duckduckgo.com/html/?q={requests.utils.quote(query + ' contact email phone website')}"
         headers = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64)"}
         response = requests.get(search_url, headers=headers, timeout=10)
         
@@ -123,11 +119,9 @@ def trigger_scrape(data: SearchRequest):
                     name = title_tag.get_text().strip()
                     snippet = snippet_tag.get_text() if snippet_tag else ""
                     
-                    # Extract any email found in the snippet text using Regex
                     emails = re.findall(r"[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}", snippet)
                     email = emails[0] if emails else "Not found in snippet"
                     
-                    # Extract phone numbers if present
                     phones = re.findall(r"\(?\d{3}\)?[-.\s]?\d{3][-.\s]?\d{4}", snippet)
                     phone = phones[0] if phones else "Available on site"
                     
@@ -142,7 +136,6 @@ def trigger_scrape(data: SearchRequest):
     except Exception as e:
         print(f"Error scraping: {e}")
 
-    # Fallback if search blocks or returns empty so you always see a functional test
     if not scraped_leads:
         scraped_leads.append({
             "business_name": "Sample Target Business",
@@ -156,3 +149,4 @@ def trigger_scrape(data: SearchRequest):
         "leads_found": len(scraped_leads),
         "results": scraped_leads
     }
+j
